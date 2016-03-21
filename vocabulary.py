@@ -75,7 +75,7 @@ class TreeViewVocabulary(ttk.Frame):
         # create a popup menu
         self.menu = tk.Menu(parent, tearoff=0)
         self.menu.add_command(label="Studied", command=self._vocabularyStudied)
-        self.menu.add_command(label="Studying", command=self._vocabularyStudying)
+        self.menu.add_command(label="New word", command=self._vocabularyStudying)
         self.menu.add_command(label="Ignore", command=self._vocabularyIgnored)
 
     def _popup(self, event):
