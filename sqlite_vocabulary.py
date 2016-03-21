@@ -5,7 +5,7 @@ class SqliteVocabulary():
     """docstring for SqliteVocabulary"""
     def __init__(self, dbname, tbname):
         self.dbname = "studyenglish.db"
-        self.tbname = "vocabulary"
+        self.tbname = tbname
         self.conn = sqlite3.connect(self.dbname) # or use :memory: to put it in RAM 
         self.cursor = self.conn.cursor()
         self.create_table()
@@ -43,6 +43,12 @@ class SqliteVocabulary():
     def delete_vocabulary(self):
         sql = """DELETE FROM """ +  self.tbname
         self.cursor.execute(sql)
+        self.conn.commit()
+
+    def update_word_status(self, word, status):
+        sql = "UPDATE " + self.tbname + " SET status = "+str(status)+" WHERE word = ?"
+        print(sql)
+        self.cursor.execute(sql,[(word)])
         self.conn.commit()
 
 
