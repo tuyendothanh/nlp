@@ -10,7 +10,7 @@ import Tkinter as tk
 from Tkinter import N, S, E, W
 from Tkinter import TOP, BOTTOM, LEFT, RIGHT, END, ALL
 
-
+'''
 def main():
     """Main function for demo."""
     # define some variables for demo only.
@@ -49,7 +49,7 @@ def create_table(database, table, *col_defs):
         c.execute('drop table if exists {};'.format(table))
         c.execute(stmnt)
         conn.commit()
-
+'''
 
 class EntryWindow(tk.Frame):
 
@@ -66,6 +66,7 @@ class EntryWindow(tk.Frame):
         self.master = master
         self.database = args[0]
         self.table = args[1]
+        self.values = args[2]
         self.init_window()
 
     def init_window(self):
@@ -114,21 +115,42 @@ class EntryWindow(tk.Frame):
                 conn.commit()
             clear_fields(self)
 
+        def update_item(self):
+            """Get entries from input fields and insert into database table."""
+            entries = [e.get() for e in self.item_entry]
+            update_entries = entries[1:] + [entries[0]]
+            print(update_entries)
+            update_column_names = self.column_names[1:]
+            # Build the SQL statement
+            stmnt = ("UPDATE " + self.table + " SET "
+                    + ', '.join(update_column_name+' = ?' for update_column_name in update_column_names)
+                    + 'WHERE word = ?')
+            print(stmnt, update_entries)
+            with sqlite3.connect(self.database) as conn:
+                c = conn.cursor()
+                c.execute(stmnt, update_entries)
+                conn.commit()
+            clear_fields(self)
+
         def clear_fields(self):
             """Clear fields of entry windo and return focus to first field."""
             for e in self.item_entry:
                 e.delete(0, END)
             self.item_entry[0].focus()
 
+        def insert_fields(self):
+            idx = 0
+            for e in self.item_entry:
+                e.insert(0, self.values[idx])
+                idx += 1
+
+        num = len(self.item_entry)
         # Add button to submit user inputs into database.
-        submit_button = tk.Button(self, text='Add Item', width=8,
-                                  command=lambda: add_item(self))
-        submit_button.grid(row=3, column=0, sticky=E, pady=10, padx=1)
+        submit_button = tk.Button(self, text='Update word', width=15, command=lambda: update_item(self))
+        submit_button.grid(row=num, column=1, sticky=W, pady=10, padx=1)
 
         # Add a cancel button which closes window.
-        quit_button = tk.Button(self, text='Cancel', width=8,
-                                command=self.quit)
-        quit_button.grid(row=3, column=1, sticky=W, pady=10, padx=1)
+        # quit_button = tk.Button(self, text='Cancel', width=8, command=self.quit)
+        # quit_button.grid(row=num, column=1, sticky=W, pady=10, padx=1)
 
-if __name__ == '__main__':
-    main()
+        insert_fields(self)

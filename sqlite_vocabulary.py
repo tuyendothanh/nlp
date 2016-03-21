@@ -13,7 +13,7 @@ class SqliteVocabulary():
     def create_table(self):
         # create a table
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS """ + self.tbname + """ 
-                  (word text, status integer, 
+                  (word text primary key, status integer, 
                   vietnamese text, japanese text, study_date text, sentence text)""")
 
     def insert_vocabulary(self, word, status, vietnamese, japanese, study_date, sentence):
@@ -36,8 +36,21 @@ class SqliteVocabulary():
         return (self.cursor.fetchone())
         
     def query_words_with_status(self, status):
-        sql = "SELECT * FROM " + self.tbname + " WHERE status=?"
-        self.cursor.execute(sql, [(status)])
+        if status != None:
+            sql = "SELECT * FROM " + self.tbname + " WHERE status=?"
+            self.cursor.execute(sql, [(status)])
+        else:
+            sql = "SELECT * FROM " + self.tbname
+            self.cursor.execute(sql)
+        return self.cursor.fetchall()  # or use fetchone()
+
+    def query_words_with_status_and_date(self, status, study_date):
+        if status != None:
+            sql = "SELECT * FROM " + self.tbname + " WHERE status=? AND study_date=?"
+            self.cursor.execute(sql, [(status),(study_date)])
+        else:
+            sql = "SELECT * FROM " + self.tbname
+            self.cursor.execute(sql)
         return self.cursor.fetchall()  # or use fetchone()
 
     def delete_vocabulary(self):
