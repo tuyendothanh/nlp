@@ -150,9 +150,12 @@ class TreeViewVocabulary(ttk.Frame):
         f = ttk.Frame(parent)
         f.pack(side=tk.TOP, fill=tk.BOTH, expand=tk.Y)
 
+        # self.dataCols = ('word', 'status', 'vietnamese', 'japanese', 'study_date', 'sentence')
         # (word, status, vietnamese, japanese, study_date, sentence)
+        sqlVocab = SqliteVocabulary("studyenglish.db", "vocabulary")
+        col_names = sqlVocab.get_col_names()
+        self.dataCols = tuple(col_names)
         # create the tree and scrollbars
-        self.dataCols = ('word', 'status', 'vietnamese', 'japanese', 'study_date', 'sentence')
         self.tree = ttk.Treeview(columns=self.dataCols)
 
         ysb = ttk.Scrollbar(orient=tk.VERTICAL, command= self.tree.yview)
@@ -162,20 +165,24 @@ class TreeViewVocabulary(ttk.Frame):
 
         # setup column headings
         self.tree.heading('#0',         text='#',           anchor=tk.E)
-        self.tree.heading('word',  text='word',  anchor=tk.W)
-        self.tree.heading('status',   text='status',   anchor=tk.E)
-        self.tree.heading('vietnamese',     text='vietnamese',      anchor=tk.W)
-        self.tree.heading('japanese',     text='japanese', anchor=tk.W)
-        self.tree.heading('study_date', text='study_date', anchor=tk.W)
-        self.tree.heading('sentence', text='sentence', anchor=tk.W)
+        """self.tree.heading('word',  text='word',  anchor=tk.W)
+                                self.tree.heading('vietnamese',     text='vietnamese',      anchor=tk.W)
+                                self.tree.heading('japanese',     text='japanese', anchor=tk.W)
+                                self.tree.heading('sentence', text='sentence', anchor=tk.W)
+                                self.tree.heading('status',   text='status',   anchor=tk.E)
+                                self.tree.heading('study_date', text='study_date', anchor=tk.W)"""
 
         self.tree.column('#0',         stretch=0, width=50 , anchor=tk.E)
-        self.tree.column('word',  stretch=0, width=160)
-        self.tree.column('status',   stretch=0, width=50, anchor=tk.E)
-        self.tree.column('vietnamese',     stretch=0, width=160)
-        self.tree.column('japanese',     stretch=0, width=160)
-        self.tree.column('study_date', stretch=0, width=100)
-        self.tree.column('sentence', stretch=0, width=300)
+        """self.tree.column('word',  stretch=0, width=160)
+                                self.tree.column('status',   stretch=0, width=50, anchor=tk.E)
+                                self.tree.column('vietnamese',     stretch=0, width=160)
+                                self.tree.column('japanese',     stretch=0, width=160)
+                                self.tree.column('study_date', stretch=0, width=100)
+                                self.tree.column('sentence', stretch=0, width=300)"""
+
+        for col in self.dataCols:
+            self.tree.heading(col,  text=col,  anchor=tk.W)
+            self.tree.column(col,  stretch=0, width=160)
 
         # add tree and scrollbars to frame
         self.tree.grid(in_=f, row=0, column=0, sticky=tk.NSEW)

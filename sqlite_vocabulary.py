@@ -13,13 +13,16 @@ class SqliteVocabulary():
     def create_table(self):
         # create a table
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS """ + self.tbname + """ 
-                  (word text primary key, status integer, 
-                  vietnamese text, japanese text, study_date text, sentence text)""")
+                    (word text primary key, syntactic text,
+                    vietnamese text, japanese text, sentence text, 
+                    status integer, study_date text,
+                    local_fdist real default 0, global_fdist real default 0)""")
 
-    def insert_vocabulary(self, word, status, vietnamese, japanese, study_date, sentence):
+    def insert_vocabulary(self, word, syntactic, vietnamese, japanese, sentence, status, study_date, local_fdist, global_fdist):
         # insert some data
-        self.cursor.execute('''INSERT INTO ''' + self.tbname + ''' (word, status, vietnamese, japanese, study_date, sentence) 
-                VALUES (?,?,?,?,?,?)''',(word.lower(), status, vietnamese, japanese, study_date, sentence))
+        self.cursor.execute('''INSERT INTO ''' + self.tbname + 
+                ''' (word, syntactic, vietnamese, japanese, sentence, status, study_date, local_fdist, global_fdist) 
+                VALUES (?,?,?,?,?,?,?,?,?)''',(word, syntactic, vietnamese, japanese, sentence, status, study_date, local_fdist, global_fdist))
         
     def commit(self):
         # save data to database
@@ -63,5 +66,18 @@ class SqliteVocabulary():
         print(sql)
         self.cursor.execute(sql,[(word)])
         self.conn.commit()
+
+    def get_col_names(self):
+        self.cursor.execute("PRAGMA table_info('{}')".format(self.tbname))
+        col_names = [x[1] for x in self.cursor.fetchall()]
+        return col_names
+
+    def update_word_freq(self, word, freq):
+        # UPDATE Products SET Price = Price + 50 WHERE ProductID = 1
+        sql = "UPDATE " + self.tbname + " SET local_fdist = " + str(freq) + ", global_fdist = global_fdist/2+" + str(freq/2) + " WHERE word = ?"
+        print(sql)
+        self.cursor.execute(sql,[(word)])
+        self.conn.commit()
+
 
 
