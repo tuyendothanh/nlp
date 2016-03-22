@@ -46,9 +46,9 @@ class TextWindow():
                 tagged = nltk.pos_tag(tokens)
 
                 for v, t in tagged:
-                    print(v,)
-                    print(t)
-                    print fdist.freq(v)
+                    #print(v,)
+                    #print(t)
+                    #print fdist.freq(v)
                     existed_word = sqlVocab.check_existed_word(v.lower())
                     if (not existed_word) and (not v.isdigit()) and v.isalpha():
                         sqlVocab.insert_vocabulary(v.lower(), t, "", "", sent, 1, strftime("%Y-%m-%d", gmtime()), 

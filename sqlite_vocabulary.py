@@ -83,7 +83,7 @@ class SqliteVocabulary():
         sql = "UPDATE " + self.tbname + " SET local_fdist = " + str(freq) + ", global_fdist = global_fdist/2+" + str(freq/2) + ", word_count = word_count+" + str(cnt) + " WHERE word = ?"
         # print(sql)
         self.cursor.execute(sql,[(word)])
-        self.conn.commit()
+        #self.conn.commit()
 
 
 

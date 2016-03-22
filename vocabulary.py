@@ -71,12 +71,20 @@ class TreeViewVocabulary(ttk.Frame):
                                 sqlVocabIgnored.commit()
                                 sqlVocabIgnored.close()"""
 
+    def _webbrowser_dictionary(self):
+        print("_webbrowser_dictionary", self.tree.item(self.item,"text"))
+        values = self.tree.item(self.item,"values")
+        import webbrowser
+        url = 'dictionary.cambridge.org/dictionary/english/' + values[0]
+        webbrowser.open(url)
+
     def _showContextMenu(self, parent):
         # create a popup menu
         self.menu = tk.Menu(parent, tearoff=0)
         self.menu.add_command(label="Studied", command=self._vocabularyStudied)
         self.menu.add_command(label="New word", command=self._vocabularyStudying)
         self.menu.add_command(label="Ignore", command=self._vocabularyIgnored)
+        self.menu.add_command(label="Web browser", command=self._webbrowser_dictionary)
 
     def _popup(self, event):
         self.item = self.tree.identify('item',event.x,event.y)
