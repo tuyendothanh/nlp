@@ -7,7 +7,7 @@ for each column in the table.
 """
 
 import nltk
-from nltk.book import *
+#from nltk.book import *
 from time import gmtime, strftime
 import sqlite3
 import Tkinter as tk
@@ -35,10 +35,10 @@ class TextWindow():
             text = st.get(1.0, END) # open('document.txt').read() # nltk.corpus.gutenberg.raw('document.txt')
             sents = sent_tokenizer.tokenize(text)
             words = nltk.word_tokenize(text)
-            fdist = FreqDist(words)
+            #fdist = FreqDist(words)
 
             sqlVocab = SqliteVocabulary("studyenglish.db", "vocabulary")
-            #sqlVocab.delete_vocabulary()
+            sqlVocab.clear_local_count()
             for sent in sents:
                 tokens = nltk.word_tokenize(sent)
                 #words = [w.lower() for w in tokens]
@@ -50,15 +50,17 @@ class TextWindow():
                     #print(t)
                     #print fdist.freq(v)
                     existed_word = sqlVocab.check_existed_word(v.lower())
-                    if (not existed_word) and (not v.isdigit()) and v.isalpha():
-                        sqlVocab.insert_vocabulary(v.lower(), t, "", "", sent, 1, strftime("%Y-%m-%d", gmtime()), 
-                                fdist.freq(v), fdist.freq(v), 0)
-
+                    #if (not v.isdigit()) and v.isalpha():
+                    if (not existed_word):
+                        sqlVocab.insert_vocabulary(v.lower(), t, "", "", sent, 1, strftime("%Y-%m-%d", gmtime()), 1, 1)
+                    else:
+                        sqlVocab.update_word_count(v.lower(), 1, 1)
+            '''
             for v in fdist.keys():
                 existed_word = sqlVocab.check_existed_word(v.lower())
                 if existed_word:
                     sqlVocab.update_word_freq(v.lower(), fdist.freq(v), fdist[v])
-
+            '''
             sqlVocab.commit()
             sqlVocab.close()
 

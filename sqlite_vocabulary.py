@@ -16,13 +16,13 @@ class SqliteVocabulary():
                     (word text primary key, syntactic text,
                     vietnamese text, japanese text, sentence text, 
                     status integer, study_date text,
-                    local_fdist real default 0, global_fdist real default 0, word_count integer default 0)""")
+                    local_count integer default 0, global_count integer default 0)""")
 
-    def insert_vocabulary(self, word, syntactic, vietnamese, japanese, sentence, status, study_date, local_fdist, global_fdist, word_count):
+    def insert_vocabulary(self, word, syntactic, vietnamese, japanese, sentence, status, study_date, local_count, global_count):
         # insert some data
         self.cursor.execute('''INSERT INTO ''' + self.tbname + 
-                ''' (word, syntactic, vietnamese, japanese, sentence, status, study_date, local_fdist, global_fdist, word_count) 
-                VALUES (?,?,?,?,?,?,?,?,?,?)''',(word, syntactic, vietnamese, japanese, sentence, status, study_date, local_fdist, global_fdist, word_count))
+                ''' (word, syntactic, vietnamese, japanese, sentence, status, study_date, local_count, global_count) 
+                VALUES (?,?,?,?,?,?,?,?,?)''',(word, syntactic, vietnamese, japanese, sentence, status, study_date, local_count, global_count))
         
     def commit(self):
         # save data to database
@@ -78,12 +78,17 @@ class SqliteVocabulary():
         col_names = [x[1] for x in self.cursor.fetchall()]
         return col_names
 
-    def update_word_freq(self, word, freq, cnt):
+    def update_word_count(self, word, lcnt, gcnt):
         # UPDATE Products SET Price = Price + 50 WHERE ProductID = 1
-        sql = "UPDATE " + self.tbname + " SET local_fdist = " + str(freq) + ", global_fdist = global_fdist/2+" + str(freq/2) + ", word_count = word_count+" + str(cnt) + " WHERE word = ?"
+        sql = "UPDATE " + self.tbname + " SET local_count = local_count+" + str(lcnt) + ", global_count = global_count+" + str(gcnt) + " WHERE word = ?"
         # print(sql)
         self.cursor.execute(sql,[(word)])
         #self.conn.commit()
+
+    def clear_local_count(self):
+        # UPDATE Products SET Price = Price + 50 WHERE ProductID = 1
+        sql = "UPDATE " + self.tbname + " SET local_count = 0"
+        self.cursor.execute(sql)
 
 
 
