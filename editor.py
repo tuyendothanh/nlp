@@ -50,13 +50,14 @@ class TextWindow():
                     print(t)
                     print fdist.freq(v)
                     existed_word = sqlVocab.check_existed_word(v.lower())
-                    if not existed_word:
-                        sqlVocab.insert_vocabulary(v.lower(), t, "", "", sent, 1, strftime("%Y-%m-%d", gmtime()), fdist.freq(v), fdist.freq(v))
+                    if (not existed_word) and (not v.isdigit()) and v.isalpha():
+                        sqlVocab.insert_vocabulary(v.lower(), t, "", "", sent, 1, strftime("%Y-%m-%d", gmtime()), 
+                                fdist.freq(v), fdist.freq(v), 0)
 
             for v in fdist.keys():
                 existed_word = sqlVocab.check_existed_word(v.lower())
                 if existed_word:
-                    sqlVocab.update_word_freq(v.lower(), fdist.freq(v))
+                    sqlVocab.update_word_freq(v.lower(), fdist.freq(v), fdist[v])
 
             sqlVocab.commit()
             sqlVocab.close()

@@ -156,7 +156,7 @@ class TreeViewVocabulary(ttk.Frame):
         quit_button = tk.Button(frame_button, text='Close', width=8, command=self.quit)
         quit_button.grid(row=0, column=6, sticky=tk.W, pady=10, padx=1)
 
-        self.query_entry = tk.Entry(frame_button, width=50)
+        self.query_entry = tk.Entry(frame_button, width=30)
         self.query_entry.insert(0, "")
         self.query_entry.grid(row=0, column=7, sticky=tk.W, pady=10, padx=1)
         #parent.bind('<Return>', (lambda event, e=query_entry: self.fetch(e)))
@@ -255,7 +255,8 @@ class TreeViewVocabulary(ttk.Frame):
         for n in range(len(self.data)):
             num = n+1
             item = self.data[num]
-            
+            tags = ('normal')
+            '''
             if item[2] == 'word': # use highlight if status is 'timedout'
                 tags = ('timedout')
             else:
@@ -263,7 +264,7 @@ class TreeViewVocabulary(ttk.Frame):
             
             if item[0].lower() == item[0].upper(): # override styles if there's a 5 in the ipaddress
                 tags = ['whacky']
-
+            '''
             self.tree.insert('', tk.END, text='%3d'%num, values=item, tags=tags)
 
 def main():
