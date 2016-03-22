@@ -75,8 +75,9 @@ class TreeViewVocabulary(ttk.Frame):
         print("_webbrowser_dictionary", self.tree.item(self.item,"text"))
         values = self.tree.item(self.item,"values")
         import webbrowser
-        url = 'dictionary.cambridge.org/dictionary/english/' + values[0]
+        url = 'http://dictionary.cambridge.org/dictionary/english/' + values[0]
         webbrowser.open(url)
+        #webbrowser.open(url, new=1, autoraise=True)
 
     def _showContextMenu(self, parent):
         # create a popup menu
