@@ -72,13 +72,27 @@ class TreeViewVocabulary(ttk.Frame):
                                 sqlVocabIgnored.commit()
                                 sqlVocabIgnored.close()"""
 
-    def _webbrowser_dictionary(self):
-        print("_webbrowser_dictionary", self.tree.item(self.item,"text"))
+    def _dictionary_cambridge_org(self):
+        print("_dictionary_cambridge_org", self.tree.item(self.item,"text"))
         values = self.tree.item(self.item,"values")
         import webbrowser
         url = 'http://dictionary.cambridge.org/dictionary/english/' + values[0]
         webbrowser.open(url)
         #webbrowser.open(url, new=1, autoraise=True)
+
+    def _tratu_soha_vn(self):
+        print("_dictionary_cambridge_org", self.tree.item(self.item,"text"))
+        values = self.tree.item(self.item,"values")
+        import webbrowser
+        url = 'http://tratu.soha.vn/dict/en_vn/' + values[0]
+        webbrowser.open(url)
+
+    def _vdict_com(self):
+        print("_dictionary_cambridge_org", self.tree.item(self.item,"text"))
+        values = self.tree.item(self.item,"values")
+        import webbrowser
+        url = "http://vdict.com/{},1,0,0.html".format(values[0])
+        webbrowser.open(url)
 
     def _showContextMenu(self, parent):
         # create a popup menu
@@ -86,7 +100,9 @@ class TreeViewVocabulary(ttk.Frame):
         self.menu.add_command(label="Studied", command=self._vocabularyStudied)
         self.menu.add_command(label="New word", command=self._vocabularyStudying)
         self.menu.add_command(label="Ignore", command=self._vocabularyIgnored)
-        self.menu.add_command(label="Web browser", command=self._webbrowser_dictionary)
+        self.menu.add_command(label="dictionary.cambridge.org", command=self._dictionary_cambridge_org)
+        self.menu.add_command(label="tratu.soha.vn", command=self._tratu_soha_vn)
+        self.menu.add_command(label="vdict.com", command=self._vdict_com)
 
     def _popup(self, event):
         self.item = self.tree.identify('item',event.x,event.y)
