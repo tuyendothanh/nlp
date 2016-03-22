@@ -7,6 +7,7 @@ import tkFont as tkfont
 import ttk
 from sqlite_table import EntryWindow
 from editor import TextWindow
+from ptb_poses import *
 
 class TreeViewVocabulary(ttk.Frame):
     def __init__(self, name='treetest'):
@@ -99,12 +100,15 @@ class TreeViewVocabulary(ttk.Frame):
         print("you clicked on", self.tree.item(item,"text"))
         values = self.tree.item(item,"values")
         print(values[0])
-        # sqlVocab = SqliteVocabulary("studyenglish.db", "vocabulary")
         db = 'studyenglish.db'
         tbl = 'vocabulary'
-        root = tk.Tk()
-        entry_window = EntryWindow(root, *[db, tbl, values])
-        #root.mainloop()
+        sqlVocab = SqliteVocabulary("studyenglish.db", "vocabulary")
+        words = sqlVocab.query_words_with_sql("word = '{}'".format(values[0]))
+        for w in words:
+            root = tk.Tk()
+            entry_window = EntryWindow(root, *[db, tbl, w])
+            #root.mainloop()
+            break
 
     def show_new_words(self):
         self._build_vocabulary_data(0)
@@ -274,6 +278,12 @@ class TreeViewVocabulary(ttk.Frame):
             if item[0].lower() == item[0].upper(): # override styles if there's a 5 in the ipaddress
                 tags = ['whacky']
             '''
+            
+            lst = list(item)
+            lst[1] = posAttributes(item[1])['description']
+            item = tuple(lst)
+            #print posAttributes(item[1])['description']
+
             self.tree.insert('', tk.END, text='%3d'%num, values=item, tags=tags)
 
 def main():
