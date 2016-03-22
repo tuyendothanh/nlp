@@ -56,6 +56,12 @@ class SqliteVocabulary():
             self.cursor.execute(sql)
         return self.cursor.fetchall()  # or use fetchone()
 
+    def query_words_with_sql(self, sql):
+        sql = "SELECT * FROM " + self.tbname + " WHERE " + sql
+        print(sql)
+        self.cursor.execute(sql)
+        return self.cursor.fetchall()
+
     def delete_vocabulary(self):
         sql = """DELETE FROM """ +  self.tbname
         self.cursor.execute(sql)
@@ -75,7 +81,7 @@ class SqliteVocabulary():
     def update_word_freq(self, word, freq):
         # UPDATE Products SET Price = Price + 50 WHERE ProductID = 1
         sql = "UPDATE " + self.tbname + " SET local_fdist = " + str(freq) + ", global_fdist = global_fdist/2+" + str(freq/2) + " WHERE word = ?"
-        print(sql)
+        # print(sql)
         self.cursor.execute(sql,[(word)])
         self.conn.commit()
 

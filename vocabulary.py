@@ -121,6 +121,16 @@ class TreeViewVocabulary(ttk.Frame):
         #root = tk.Tk()
         text_wnd = TextWindow(None)
 
+    def fetch(self, entry):
+        sql = entry.get()
+        self._query_vocabulary_data(sql)
+        self._populate_tree()
+
+    def show_option_words(self):
+        sql = self.query_entry.get()
+        self._query_vocabulary_data(sql)
+        self._populate_tree()
+
     def _create_button(self, parent):
         frame_button = tk.Frame(parent)
         frame_button.pack(side=tk.TOP, fill=tk.X, padx=2, pady=2)
@@ -145,6 +155,14 @@ class TreeViewVocabulary(ttk.Frame):
         # Add a cancel button which closes window.
         quit_button = tk.Button(frame_button, text='Close', width=8, command=self.quit)
         quit_button.grid(row=0, column=6, sticky=tk.W, pady=10, padx=1)
+
+        self.query_entry = tk.Entry(frame_button, width=50)
+        self.query_entry.insert(0, "")
+        self.query_entry.grid(row=0, column=7, sticky=tk.W, pady=10, padx=1)
+        #parent.bind('<Return>', (lambda event, e=query_entry: self.fetch(e)))
+        # Add button to query database.
+        query_button = tk.Button(frame_button, text='Query', width=10, command=lambda: self.show_option_words())
+        query_button.grid(row=0, column=8, sticky=tk.E, pady=10, padx=1)
 
     def _create_treeview(self, parent):
         f = ttk.Frame(parent)
@@ -217,6 +235,17 @@ class TreeViewVocabulary(ttk.Frame):
             words = sqlVocab.query_words_with_status(status)
         else:
             words = sqlVocab.query_words_with_status_and_date(status, strftime("%Y-%m-%d", gmtime()))
+        num = 0
+        for w in words:
+            num += 1
+            self.data[num] = w
+
+    def _query_vocabulary_data(self, sql):
+        self.tree.delete(*self.tree.get_children())
+        self.data = {}
+
+        sqlVocab = SqliteVocabulary("studyenglish.db", "vocabulary")
+        words = sqlVocab.query_words_with_sql(sql)
         num = 0
         for w in words:
             num += 1
