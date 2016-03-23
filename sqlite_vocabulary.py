@@ -13,16 +13,16 @@ class SqliteVocabulary():
     def create_table(self):
         # create a table
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS """ + self.tbname + """ 
-                    (word text primary key, syntactic text,
+                    (word text primary key, uk_pron text default null, us_pron text default null, syntactic text,
                     vietnamese text, japanese text, sentence text, 
                     status integer, study_date text,
                     local_count integer default 0, global_count integer default 0)""")
 
-    def insert_vocabulary(self, word, syntactic, vietnamese, japanese, sentence, status, study_date, local_count, global_count):
+    def insert_vocabulary(self, word, uk_pron, us_pron, syntactic, vietnamese, japanese, sentence, status, study_date, local_count, global_count):
         # insert some data
         self.cursor.execute('''INSERT INTO ''' + self.tbname + 
-                ''' (word, syntactic, vietnamese, japanese, sentence, status, study_date, local_count, global_count) 
-                VALUES (?,?,?,?,?,?,?,?,?)''',(word, syntactic, vietnamese, japanese, sentence, status, study_date, local_count, global_count))
+                ''' (word, uk_pron, us_pron, syntactic, vietnamese, japanese, sentence, status, study_date, local_count, global_count) 
+                VALUES (?,?,?,?,?,?,?,?,?,?,?)''',(word, uk_pron, us_pron, syntactic, vietnamese, japanese, sentence, status, study_date, local_count, global_count))
         
     def commit(self):
         # save data to database
@@ -89,6 +89,18 @@ class SqliteVocabulary():
         # UPDATE Products SET Price = Price + 50 WHERE ProductID = 1
         sql = "UPDATE " + self.tbname + " SET local_count = 0"
         self.cursor.execute(sql)
+
+    def update_uk_pron(self, word, uk_pron):
+        sql = "UPDATE " + self.tbname + " SET uk_pron = ? WHERE word = ? AND uk_pron = ''"
+        print(sql)
+        self.cursor.execute(sql,[(uk_pron),(word)])
+        self.conn.commit()
+
+    def update_us_pron(self, word, us_pron):
+        sql = "UPDATE " + self.tbname + " SET us_pron = ? WHERE word = ? AND us_pron = ''"
+        print(sql)
+        self.cursor.execute(sql,[(us_pron),(word)])
+        self.conn.commit()
 
 
 

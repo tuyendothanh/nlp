@@ -98,7 +98,16 @@ class TreeViewVocabulary(ttk.Frame):
         html = requests.get(url).content                                          
         tree = lxml.html.fromstring(html)
         uks = tree.xpath("//span[@class='sound audio_play_button pron-icon uk']/@data-src-mp3")
-        #uss = tree.xpath("//span[@class='sound audio_play_button pron-icon us']/@data-src-mp3")
+
+        #pos_header = tree.xpath("//div[@class='pos-header']")[0]
+        uks_pron = tree.xpath("//span[@class='uk']/span[@class='pron']/span[@class='ipa']/text()")
+        sqlVocab = SqliteVocabulary("studyenglish.db", "vocabulary")
+        uks_pron_uniq = set(uks_pron)
+        prons = u','.join(uks_pron_uniq)
+        #if len(uks_pron_uniq)>2:
+        #    prons = u','.join(uks_pron_uniq[0:2])
+        sqlVocab.update_uk_pron(word, prons)
+
         return uks
 
     def _get_uss_link_mp3_cambridge(self, word):
@@ -108,6 +117,17 @@ class TreeViewVocabulary(ttk.Frame):
         html = requests.get(url).content                                          
         tree = lxml.html.fromstring(html)
         uss = tree.xpath("//span[@class='sound audio_play_button pron-icon us']/@data-src-mp3")
+
+        #pos_header = tree.xpath("//div[@class='pos-header']")[0]
+        uss_pron = tree.xpath("//span[@class='us']/span[@class='pron']/span[@class='ipa']/text()")
+        sqlVocab = SqliteVocabulary("studyenglish.db", "vocabulary")
+        uss_pron_uniq = set(uss_pron)
+        prons = u','.join(uss_pron_uniq)
+        #print uss_pron_uniq
+        #if len(uss_pron_uniq)>2:
+        #    prons = u','.join(uss_pron_uniq[0:2])
+        sqlVocab.update_us_pron(word, prons)
+
         return uss
 
     def _download_mp3_cambridge(self, region_link, region_pron_dir):
@@ -173,8 +193,9 @@ class TreeViewVocabulary(ttk.Frame):
         self.menu.add_command(label="dictionary.cambridge.org", command=self._dictionary_cambridge_org)
         self.menu.add_command(label="tratu.soha.vn", command=self._tratu_soha_vn)
         self.menu.add_command(label="vdict.com", command=self._vdict_com)
-        self.menu.add_command(label="us pron", command=self._us_pron)
         self.menu.add_command(label="uk pron", command=self._uk_pron)
+        self.menu.add_command(label="us pron", command=self._us_pron)
+        
 
     def _popup(self, event):
         self.item = self.tree.identify('item',event.x,event.y)
@@ -368,7 +389,7 @@ class TreeViewVocabulary(ttk.Frame):
             '''
             
             lst = list(item)
-            lst[1] = posAttributes(item[1])['description']
+            lst[3] = posAttributes(item[3])['description']
             item = tuple(lst)
             #print posAttributes(item[1])['description']
 

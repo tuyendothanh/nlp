@@ -52,7 +52,7 @@ class TextWindow():
                     existed_word = sqlVocab.check_existed_word(v.lower())
                     #if (not v.isdigit()) and v.isalpha():
                     if (not existed_word):
-                        sqlVocab.insert_vocabulary(v.lower(), t, "", "", sent, 1, strftime("%Y-%m-%d", gmtime()), 1, 1)
+                        sqlVocab.insert_vocabulary(v.lower(), "", "", t, "", "", sent, 1, strftime("%Y-%m-%d", gmtime()), 1, 1)
                     else:
                         sqlVocab.update_word_count(v.lower(), 1, 1)
             '''
