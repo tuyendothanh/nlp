@@ -114,7 +114,7 @@ class TreeViewVocabulary(ttk.Frame):
         uks_pron = tree.xpath("//span[@class='uk']/span[@class='pron']/span[@class='ipa']/text()")
         sqlVocab = SqliteVocabulary("studyenglish.db", "vocabulary")
         uks_pron_uniq = set(uks_pron)
-        prons = u','.join(uks_pron_uniq)
+        prons = u'/' + u'/,/'.join(uks_pron_uniq) + u'/'
         #if len(uks_pron_uniq)>2:
         #    prons = u','.join(uks_pron_uniq[0:2])
         sqlVocab.update_uk_pron(word, prons)
@@ -133,7 +133,7 @@ class TreeViewVocabulary(ttk.Frame):
         uss_pron = tree.xpath("//span[@class='us']/span[@class='pron']/span[@class='ipa']/text()")
         sqlVocab = SqliteVocabulary("studyenglish.db", "vocabulary")
         uss_pron_uniq = set(uss_pron)
-        prons = u','.join(uss_pron_uniq)
+        prons = u'/' + u'/,/'.join(uss_pron_uniq) + u'/'
         #print uss_pron_uniq
         #if len(uss_pron_uniq)>2:
         #    prons = u','.join(uss_pron_uniq[0:2])

@@ -114,7 +114,7 @@ class EntryWindow(tk.Frame):
                 c.execute(stmnt, entries)
                 conn.commit()
             clear_fields(self)
-            self.destroy()
+            self.master.destroy()
 
         def update_item(self):
             """Get entries from input fields and insert into database table."""
@@ -132,7 +132,7 @@ class EntryWindow(tk.Frame):
                 c.execute(stmnt, update_entries)
                 conn.commit()
             clear_fields(self)
-            self.destroy()
+            self.master.destroy()
 
         def clear_fields(self):
             """Clear fields of entry windo and return focus to first field."""
