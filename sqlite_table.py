@@ -108,12 +108,13 @@ class EntryWindow(tk.Frame):
             stmnt = ('insert into {0}({1}) values ({2})'
                      .format(self.table, ','.join(self.column_names),
                              ':'+',:'.join(self.column_names)))
-            # print(stmnt, entries)
+            print(stmnt, entries)
             with sqlite3.connect(self.database) as conn:
                 c = conn.cursor()
                 c.execute(stmnt, entries)
                 conn.commit()
             clear_fields(self)
+            self.destroy()
 
         def update_item(self):
             """Get entries from input fields and insert into database table."""
@@ -131,6 +132,7 @@ class EntryWindow(tk.Frame):
                 c.execute(stmnt, update_entries)
                 conn.commit()
             clear_fields(self)
+            self.destroy()
 
         def clear_fields(self):
             """Clear fields of entry windo and return focus to first field."""
@@ -147,7 +149,11 @@ class EntryWindow(tk.Frame):
         num = len(self.item_entry)
         # Add button to submit user inputs into database.
         submit_button = tk.Button(self, text='Update word', width=15, command=lambda: update_item(self))
-        submit_button.grid(row=num, column=1, sticky=W, pady=10, padx=1)
+        submit_button.grid(row=num, column=0, sticky=W, pady=10, padx=1)
+
+        # Add button to submit user inputs into database.
+        add_button = tk.Button(self, text='Add word', width=15, command=lambda: add_item(self))
+        add_button.grid(row=num, column=1, sticky=W, pady=10, padx=1)
 
         # Add a cancel button which closes window.
         # quit_button = tk.Button(self, text='Cancel', width=8, command=self.quit)

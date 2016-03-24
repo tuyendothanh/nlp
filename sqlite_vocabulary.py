@@ -67,6 +67,11 @@ class SqliteVocabulary():
         self.cursor.execute(sql)
         self.conn.commit()
 
+    def delete_word(self, word):
+        sql = "DELETE FROM " + self.tbname + " WHERE word = ?"
+        self.cursor.execute(sql,[(word)])
+        self.conn.commit()
+
     def update_word_status(self, word, status):
         sql = "UPDATE " + self.tbname + " SET status = "+str(status)+" WHERE word = ?"
         print(sql)

@@ -75,7 +75,7 @@ class TreeViewVocabulary(ttk.Frame):
                                 sqlVocabIgnored.commit()
                                 sqlVocabIgnored.close()"""
 
-    def _vocabularyEditted(self):
+    def _edit_vocabulary(self):
         # item = self.tree.selection()[0]
         #item = self.tree.identify('item',event.x,event.y)
         #print("you clicked on", self.tree.item(item,"text"))
@@ -90,6 +90,17 @@ class TreeViewVocabulary(ttk.Frame):
             entry_window = EntryWindow(root, *[db, tbl, w])
             #root.mainloop()
             break
+
+    def _delete_vocabulary(self):
+        # item = self.tree.selection()[0]
+        #item = self.tree.identify('item',event.x,event.y)
+        #print("you clicked on", self.tree.item(item,"text"))
+        values = self.tree.item(self.item,"values")
+        print(values[0])
+        db = 'studyenglish.db'
+        tbl = 'vocabulary'
+        sqlVocab = SqliteVocabulary("studyenglish.db", "vocabulary")
+        words = sqlVocab.delete_word(values[0])
 
     def _get_uks_link_mp3_cambridge(self, word):
         BASE_URL = 'http://dictionary.cambridge.org/dictionary/english/'
@@ -160,7 +171,7 @@ class TreeViewVocabulary(ttk.Frame):
         webbrowser.open(url)
 
     def _us_pron(self):
-        print("_dictionary_cambridge_org", self.tree.item(self.item,"text"))
+        print("_us_pron", self.tree.item(self.item,"text"))
         values = self.tree.item(self.item,"values")
         uss = self._get_uss_link_mp3_cambridge(values[0])
         if uss:
@@ -172,7 +183,7 @@ class TreeViewVocabulary(ttk.Frame):
                 mixer.music.play()
 
     def _uk_pron(self):
-        print("_dictionary_cambridge_org", self.tree.item(self.item,"text"))
+        print("_uk_pron", self.tree.item(self.item,"text"))
         values = self.tree.item(self.item,"values")
         uks = self._get_uks_link_mp3_cambridge(values[0])
         if uks:
@@ -189,13 +200,13 @@ class TreeViewVocabulary(ttk.Frame):
         self.menu.add_command(label="Studied", command=self._vocabularyStudied)
         self.menu.add_command(label="New word", command=self._vocabularyStudying)
         self.menu.add_command(label="Ignore", command=self._vocabularyIgnored)
-        self.menu.add_command(label="Edit", command=self._vocabularyEditted)
         self.menu.add_command(label="dictionary.cambridge.org", command=self._dictionary_cambridge_org)
         self.menu.add_command(label="tratu.soha.vn", command=self._tratu_soha_vn)
         self.menu.add_command(label="vdict.com", command=self._vdict_com)
         self.menu.add_command(label="uk pron", command=self._uk_pron)
         self.menu.add_command(label="us pron", command=self._us_pron)
-        
+        self.menu.add_command(label="Edit word", command=self._edit_vocabulary)
+        self.menu.add_command(label="Delete word", command=self._delete_vocabulary)
 
     def _popup(self, event):
         self.item = self.tree.identify('item',event.x,event.y)
@@ -205,8 +216,12 @@ class TreeViewVocabulary(ttk.Frame):
 
     def OnDoubleClick(self, event):
         item = self.tree.identify('item',event.x,event.y)
+        identify_column = self.tree.identify_column(event.x)
         self.item = item
-        self._us_pron()
+        if identify_column == '#2':
+            self._uk_pron()
+        else:
+            self._us_pron()
         '''
         values = self.tree.item(item,"values")
         uss = self._get_uss_link_mp3_cambridge(values[0])
