@@ -1,5 +1,9 @@
 
 import nltk
+from nltk.stem.wordnet import WordNetLemmatizer
+from nltk.tokenize import word_tokenize
+from nltk.corpus import wordnet as wn
+
 from time import gmtime, strftime
 from sqlite_vocabulary import SqliteVocabulary
 import Tkinter as tk
@@ -31,10 +35,11 @@ class TreeViewVocabulary(ttk.Frame):
         self.tree.bind("<Button-3>", self._popup)
 
     def _vocabularyStudied(self):
-        print("_vocabularyStudied", self.tree.item(self.item,"text"))
-        values = self.tree.item(self.item,"values")
         sqlVocab = SqliteVocabulary("studyenglish.db", "vocabulary")
-        sqlVocab.update_word_status(values[0], 1)        
+        for item in self.items:
+            print("_vocabularyStudied", self.tree.item(item,"text"))
+            values = self.tree.item(item,"values")
+            sqlVocab.update_word_status(values[0], 1)        
         """sqlVocabStudied = SqliteVocabulary("studyenglish.db", "vocabulary_studied")
                                 # sqlVocabStudied.delete_vocabulary()
                                 values = self.tree.item(self.item,"values")
@@ -46,10 +51,11 @@ class TreeViewVocabulary(ttk.Frame):
                                 sqlVocabStudied.close()"""
 
     def _vocabularyStudying(self):
-        print("_vocabularyStudying", self.tree.item(self.item,"text"))
-        values = self.tree.item(self.item,"values")
         sqlVocab = SqliteVocabulary("studyenglish.db", "vocabulary")
-        sqlVocab.update_word_status(values[0], 0)
+        for item in self.items:            
+            print("_vocabularyStudying", self.tree.item(item,"text"))
+            values = self.tree.item(item,"values")
+            sqlVocab.update_word_status(values[0], 0)
         """sqlVocabStudying = SqliteVocabulary("studyenglish.db", "vocabulary_studying")
                                 # sqlVocabStudying.delete_vocabulary()
                                 values = self.tree.item(self.item,"values")
@@ -61,10 +67,11 @@ class TreeViewVocabulary(ttk.Frame):
                                 sqlVocabStudying.close()"""
 
     def _vocabularyIgnored(self):
-        print("_vocabularyInorge", self.tree.item(self.item,"text"))
-        values = self.tree.item(self.item,"values")
         sqlVocab = SqliteVocabulary("studyenglish.db", "vocabulary")
-        sqlVocab.update_word_status(values[0], -1)
+        for item in self.items:            
+            print("_vocabularyInorge", self.tree.item(item,"text"))
+            values = self.tree.item(item,"values")
+            sqlVocab.update_word_status(values[0], -1)
         """sqlVocabIgnored = SqliteVocabulary("studyenglish.db", "vocabulary_ignored")
                                 # sqlVocabIgnored.delete_vocabulary()
                                 values = self.tree.item(self.item,"values")
@@ -102,42 +109,50 @@ class TreeViewVocabulary(ttk.Frame):
         sqlVocab = SqliteVocabulary("studyenglish.db", "vocabulary")
         words = sqlVocab.delete_word(values[0])
 
-    def _get_uks_link_mp3_cambridge(self, word):
+    def _get_uks_link_mp3_cambridge(self, org_word, word, item):
         BASE_URL = 'http://dictionary.cambridge.org/dictionary/english/'
         url = BASE_URL + word
-
+        print(url)
         html = requests.get(url).content                                          
         tree = lxml.html.fromstring(html)
         uks = tree.xpath("//span[@class='sound audio_play_button pron-icon uk']/@data-src-mp3")
 
         #pos_header = tree.xpath("//div[@class='pos-header']")[0]
-        uks_pron = tree.xpath("//span[@class='uk']/span[@class='pron']/span[@class='ipa']/text()")
+        # //*[@id="dataset-british"]/div[1]/div[2]/div/div/div[1]/span[2]
+        # //*[@id="dataset-british"]/div[1]/div[2]/div/div/div[1]/span[2]/span
+        # //*[@id="dataset-british"]/div[1]/div[2]/div/div/div[1]/span[@class='uk']/span[@class='pron']/span[@class='ipa']/text()
+        # uks_pron = tree.xpath("//span[@class='uk']/span[@class='pron']/span[@class='ipa']/text()")
+        uks_pron_html = tree.xpath("//*[@id='dataset-british']/div[1]/div[2]/div/div/div[1]/span[@class='uk']/span[@class='pron']/span[@class='ipa']")
         sqlVocab = SqliteVocabulary("studyenglish.db", "vocabulary")
-        uks_pron_uniq = set(uks_pron)
-        prons = u'/' + u'/,/'.join(uks_pron_uniq) + u'/'
-        #if len(uks_pron_uniq)>2:
-        #    prons = u','.join(uks_pron_uniq[0:2])
-        sqlVocab.update_uk_pron(word, prons)
+        #import xml.etree.ElementTree as ET
+        uks_pron = [html.text_content() for html in uks_pron_html]
+        prons = u'/' + u'/,/'.join(uks_pron) + u'/'
+        #if uks_pron:
+        #    prons = u'/' + uks_pron[0] + u'/'
+        self.tree.set(item,'#2',prons)
+        if len(uks_pron)>0:
+            sqlVocab.update_uk_pron(org_word, prons)
 
         return uks
 
-    def _get_uss_link_mp3_cambridge(self, word):
+    def _get_uss_link_mp3_cambridge(self, org_word, word, item):
         BASE_URL = 'http://dictionary.cambridge.org/dictionary/english/'
         url = BASE_URL + word
-
+        print(url)
         html = requests.get(url).content                                          
         tree = lxml.html.fromstring(html)
         uss = tree.xpath("//span[@class='sound audio_play_button pron-icon us']/@data-src-mp3")
 
         #pos_header = tree.xpath("//div[@class='pos-header']")[0]
-        uss_pron = tree.xpath("//span[@class='us']/span[@class='pron']/span[@class='ipa']/text()")
+        #uss_pron = tree.xpath("//span[@class='us']/span[@class='pron']/span[@class='ipa']/text()")
+        #uss_pron = tree.xpath("//*[@id='dataset-british']/div[1]/div[2]/div/div/div[1]/span[@class='us']/span[@class='pron']/span[@class='ipa']/text()")
+        uss_pron_html = tree.xpath("//*[@id='dataset-british']/div[1]/div[2]/div/div/div[1]/span[@class='us']/span[@class='pron']/span[@class='ipa']")
         sqlVocab = SqliteVocabulary("studyenglish.db", "vocabulary")
-        uss_pron_uniq = set(uss_pron)
-        prons = u'/' + u'/,/'.join(uss_pron_uniq) + u'/'
-        #print uss_pron_uniq
-        #if len(uss_pron_uniq)>2:
-        #    prons = u','.join(uss_pron_uniq[0:2])
-        sqlVocab.update_us_pron(word, prons)
+        uss_pron = [html.text_content() for html in uss_pron_html]
+        prons = u'/' + u'/,/'.join(uss_pron) + u'/'
+        self.tree.set(item,'#3',prons)
+        if len(uss_pron)>0:
+            sqlVocab.update_us_pron(org_word, prons)
 
         return uss
 
@@ -171,34 +186,98 @@ class TreeViewVocabulary(ttk.Frame):
         webbrowser.open(url)
 
     def _us_pron(self):
-        print("_us_pron", self.tree.item(self.item,"text"))
-        values = self.tree.item(self.item,"values")
-        uss = self._get_uss_link_mp3_cambridge(values[0])
-        if uss:
-            sound_dir = self._download_mp3_cambridge(uss[0], 'us_pron')
+        sqlVocab = SqliteVocabulary("studyenglish.db", "vocabulary")
+        for item in self.items:
+            print("_us_pron", self.tree.item(item,"text"))
+            values = self.tree.item(item,"values")
+            
+            sound_dir, = sqlVocab.get_us_sound(values[0])
+            if not sound_dir:
+                uss = self._get_uss_link_mp3_cambridge(values[0], values[0], item)
+                if not uss:
+                    words = sqlVocab.query_words_with_sql("word = '{}'".format(values[0]))
+                    wn_tag = self.penn_to_wn(words[0][3])
+                    uss = self._get_uss_link_mp3_cambridge(values[0], WordNetLemmatizer().lemmatize(values[0],wn_tag), item)
+                if uss:
+                    sound_dir = self._download_mp3_cambridge(uss[0], 'us_pron')
+                    if os.path.exists(sound_dir):
+                        sqlVocab.update_us_sound(values[0], sound_dir)
+
             if os.path.exists(sound_dir):
                 from pygame import mixer
                 mixer.init()
                 mixer.music.load(sound_dir)
                 mixer.music.play()
+                if len(self.items)>1:
+                    import time
+                    time.sleep(2) # delays for 2 seconds
 
     def _uk_pron(self):
-        print("_uk_pron", self.tree.item(self.item,"text"))
-        values = self.tree.item(self.item,"values")
-        uks = self._get_uks_link_mp3_cambridge(values[0])
-        if uks:
-            sound_dir = self._download_mp3_cambridge(uks[0], 'uk_pron')
+        sqlVocab = SqliteVocabulary("studyenglish.db", "vocabulary")
+        for item in self.items:
+            print("_uk_pron", self.tree.item(item,"text"))
+            values = self.tree.item(item,"values")
+            
+            sound_dir, = sqlVocab.get_uk_sound(values[0])
+            if not sound_dir:
+                uks = self._get_uks_link_mp3_cambridge(values[0], values[0], item)
+                if not uks:
+                    words = sqlVocab.query_words_with_sql("word = '{}'".format(values[0]))
+                    wn_tag = self.penn_to_wn(words[0][3])
+                    uks = self._get_uks_link_mp3_cambridge(values[0], WordNetLemmatizer().lemmatize(values[0],wn_tag), item)
+                if uks:
+                    sound_dir = self._download_mp3_cambridge(uks[0], 'uk_pron')
+                    if os.path.exists(sound_dir):
+                        sqlVocab.update_uk_sound(values[0], sound_dir)
+
             if os.path.exists(sound_dir):
                 from pygame import mixer
                 mixer.init()
                 mixer.music.load(sound_dir)
                 mixer.music.play()
+                if len(self.items)>1:
+                    import time
+                    time.sleep(2) # delays for 2 seconds
+                
+
+    def is_noun(self, tag):
+        return tag in ['NN', 'NNS', 'NNP', 'NNPS']
+
+    def is_verb(self, tag):
+        return tag in ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']
+
+    def is_adverb(self, tag):
+        return tag in ['RB', 'RBR', 'RBS']
+
+    def is_adjective(self, tag):
+        return tag in ['JJ', 'JJR', 'JJS']
+
+    def penn_to_wn(self, tag):
+        if self.is_adjective(tag):
+            return wn.ADJ
+        elif self.is_noun(tag):
+            return wn.NOUN
+        elif self.is_adverb(tag):
+            return wn.ADV
+        elif self.is_verb(tag):
+            return wn.VERB
+        else:
+            if tag.startswith('J'):
+                return wn.ADJ
+            elif tag.startswith('V'):
+                return wn.VERB
+            elif tag.startswith('N'):
+                return wn.NOUN
+            elif tag.startswith('R'):
+                return wn.ADV
+
+        return wn.NOUN
 
     def _showContextMenu(self, parent):
         # create a popup menu
         self.menu = tk.Menu(parent, tearoff=0)
-        self.menu.add_command(label="Studied", command=self._vocabularyStudied)
         self.menu.add_command(label="New word", command=self._vocabularyStudying)
+        self.menu.add_command(label="Studied", command=self._vocabularyStudied)        
         self.menu.add_command(label="Ignore", command=self._vocabularyIgnored)
         self.menu.add_command(label="dictionary.cambridge.org", command=self._dictionary_cambridge_org)
         self.menu.add_command(label="tratu.soha.vn", command=self._tratu_soha_vn)
@@ -210,14 +289,17 @@ class TreeViewVocabulary(ttk.Frame):
 
     def _popup(self, event):
         self.item = self.tree.identify('item',event.x,event.y)
+        self.items = self.tree.selection()
         print("you clicked on", self.tree.item(self.item,"text"))
-        self.tree.selection_set(self.item)
+        if len(self.items) == 1:
+            self.tree.selection_set(self.item)
         self.menu.post(event.x_root, event.y_root)
 
     def OnDoubleClick(self, event):
         item = self.tree.identify('item',event.x,event.y)
         identify_column = self.tree.identify_column(event.x)
         self.item = item
+        self.items = [item]
         if identify_column == '#2':
             self._uk_pron()
         else:
@@ -256,7 +338,7 @@ class TreeViewVocabulary(ttk.Frame):
 
     def show_input_words(self):
         #root = tk.Tk()
-        text_wnd = TextWindow(None)
+        text_wnd = TextWindow(None, self.show_all_words)
 
     def fetch(self, entry):
         sql = entry.get()

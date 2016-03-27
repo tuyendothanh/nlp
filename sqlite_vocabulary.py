@@ -16,13 +16,14 @@ class SqliteVocabulary():
                     (word text primary key, uk_pron text default null, us_pron text default null, syntactic text,
                     vietnamese text, japanese text, sentence text, 
                     status integer, study_date text,
-                    local_count integer default 0, global_count integer default 0)""")
+                    local_count integer default 0, global_count integer default 0, 
+                    uk_sound text default null, us_sound text default null)""")
 
-    def insert_vocabulary(self, word, uk_pron, us_pron, syntactic, vietnamese, japanese, sentence, status, study_date, local_count, global_count):
+    def insert_vocabulary(self, word, uk_pron, us_pron, syntactic, vietnamese, japanese, sentence, status, study_date, local_count, global_count, uk_sound='', us_sound=''):
         # insert some data
         self.cursor.execute('''INSERT INTO ''' + self.tbname + 
-                ''' (word, uk_pron, us_pron, syntactic, vietnamese, japanese, sentence, status, study_date, local_count, global_count) 
-                VALUES (?,?,?,?,?,?,?,?,?,?,?)''',(word, uk_pron, us_pron, syntactic, vietnamese, japanese, sentence, status, study_date, local_count, global_count))
+                ''' (word, uk_pron, us_pron, syntactic, vietnamese, japanese, sentence, status, study_date, local_count, global_count, uk_sound, us_sound) 
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)''',(word, uk_pron, us_pron, syntactic, vietnamese, japanese, sentence, status, study_date, local_count, global_count, uk_sound, us_sound))
         
     def commit(self):
         # save data to database
@@ -106,6 +107,28 @@ class SqliteVocabulary():
         print(sql)
         self.cursor.execute(sql,[(us_pron),(word)])
         self.conn.commit()
+
+    def update_uk_sound(self, word, uk_sound):
+        sql = "UPDATE " + self.tbname + " SET uk_sound = ? WHERE word = ? AND uk_sound = ''"
+        print(sql)
+        self.cursor.execute(sql,[(uk_sound),(word)])
+        self.conn.commit()
+
+    def update_us_sound(self, word, us_sound):
+        sql = "UPDATE " + self.tbname + " SET us_sound = ? WHERE word = ? AND us_sound = ''"
+        print(sql)
+        self.cursor.execute(sql,[(us_sound),(word)])
+        self.conn.commit()
+
+    def get_uk_sound(self, word):
+        sql = "SELECT uk_sound FROM " + self.tbname + " WHERE word=?"
+        self.cursor.execute(sql,[(word)])
+        return self.cursor.fetchone()
+
+    def get_us_sound(self, word):
+        sql = "SELECT us_sound FROM " + self.tbname + " WHERE word=?"
+        self.cursor.execute(sql,[(word)])
+        return self.cursor.fetchone()
 
 
 

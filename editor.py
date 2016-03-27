@@ -18,9 +18,10 @@ from sqlite_vocabulary import SqliteVocabulary
 
 class TextWindow():
 
-    def __init__(self, master=None, *args):
+    def __init__(self, master=None, show_all_words=None, *args):
         #tk.Frame.__init__(self, master)
         self.master = tk.Tk()
+        self.show_all_words = show_all_words
         self.init_window()
         #self.master.mainloop()
 
@@ -52,7 +53,7 @@ class TextWindow():
                     existed_word = sqlVocab.check_existed_word(v.lower())
                     #if (not v.isdigit()) and v.isalpha():
                     if (not existed_word):
-                        sqlVocab.insert_vocabulary(v.lower(), "", "", t, "", "", sent, 1, strftime("%Y-%m-%d", gmtime()), 1, 1)
+                        sqlVocab.insert_vocabulary(v.lower(), "", "", t, "", "", sent, -2, strftime("%Y-%m-%d", gmtime()), 1, 1)
                     else:
                         sqlVocab.update_word_count(v.lower(), 1, 1)
             '''
@@ -64,6 +65,7 @@ class TextWindow():
             sqlVocab.commit()
             sqlVocab.close()
 
+            self.show_all_words()
             self.master.destroy()
 
         frame_button = tk.Frame(self.master)
